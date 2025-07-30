@@ -5,7 +5,7 @@ import datetime
 
 
 
-MAX_TOKENS = 1000
+MAX_TOKENS = 500
 SENT_TOKENS_FILE = "sent_tokens.json"
 BOOST_SENT_FILE = "sent_boost.json"
 SENT_TRENDS_FILE = "sent_trends.json"
