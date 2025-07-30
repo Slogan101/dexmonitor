@@ -99,14 +99,14 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
             f"<code>{token_address}</code>\n\n"
             f"🌱 Age: {age} | 💰 MC: <code>${main_cap}</code>\n💧 Liq: <code>${main_liq}</code> | 📈 24H Vol: <code>${main_vol}</code>\n\n"
             f"📊<a href='{chart}'>Chart</a>\n\n"
-            f"🔗 <b>Social Links:</b>\n{links_text}"
+            f"🔗 <b>{links_text}</b>"
         )
         if header != "Unknown":
             for chat_id in registered_groups:
                 try:
                     await context.bot.send_photo(chat_id=chat_id, photo=header, caption=message, parse_mode=ParseMode.HTML)
                     new_tokens.append(signature)
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(4)
                 except Exception as e:
                     print(f"Error sending to {chat_id}: {e}")
             else:
@@ -114,7 +114,7 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
                     try:
                         await context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
                         new_tokens.append(signature)
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(4)
                     except Exception as e:
                         print(f"Error sending to {chat_id}: {e}")
 
@@ -158,7 +158,7 @@ async def get_latest_boost(context: CallbackContext):
                 label = link.get("label") or link.get("type", "Unknown").capitalize()
                 url = link.get("url", "No URL")
                 link_lines.append(f"<a href='{url}'>{label}</a>")
-            links_text = "\n".join(link_lines)
+            links_text = " | ".join(link_lines)
         else:
             links_text = "None"
 
@@ -168,7 +168,7 @@ async def get_latest_boost(context: CallbackContext):
             f"<code>{token_address}</code>\n\n"
             f"<b>Boosts</b>: {recent_boosts} (Total: {total_boosts})\n\n"
             f"📊<a href='{chart}'>Chart</a>\n"
-            f"🔗 <b>Social Links:</b>\n{links_text}"
+            f"🔗 <b>{links_text}</b>"
         )
 
         if header != "Unknown":
@@ -176,7 +176,7 @@ async def get_latest_boost(context: CallbackContext):
                 try:
                     await context.bot.send_photo(chat_id=chat_id, photo=header, caption=message, parse_mode=ParseMode.HTML)
                     new_boosts.append(signature)
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(4)
                 except Exception as e:
                     print(f"Error sending to {chat_id}: {e}")
             else:
@@ -184,7 +184,7 @@ async def get_latest_boost(context: CallbackContext):
                     try:
                         await context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
                         new_boosts.append(signature)
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(4)
                     except Exception as e:
                         print(f"Error sending to {chat_id}: {e}")
 
@@ -240,7 +240,7 @@ async def get_trending(update: Update, context: CallbackContext):
                 label = link.get("label") or link.get("type", "Unknown").capitalize()
                 url = link.get("url", "No URL")
                 link_lines.append(f"<a href='{url}'>{label}</a>")
-            links_text = "\n".join(link_lines)
+            links_text = " | ".join(link_lines)
         else:
             links_text = "None"
 
@@ -250,7 +250,7 @@ async def get_trending(update: Update, context: CallbackContext):
             f"<code>{token_address}</code>\n\n"
             f"🌱 Age: {age} | 💰 MC: <code>${main_cap}</code>\n💧 Liq: <code>${main_liq}</code> | 📈 24H Vol: <code>${main_vol}</code>\n\n"
             f"📊<a href='{chart}'>Chart</a>\n"
-            f"🔗 <b>Social Links:</b>\n{links_text}"
+            f"🔗 <b>{links_text}</b>"
         )
 
         if header != "Unknown":
@@ -258,7 +258,7 @@ async def get_trending(update: Update, context: CallbackContext):
                 try:
                     await context.bot.send_photo(chat_id=chat_id, photo=header, caption=message, parse_mode=ParseMode.HTML)
                     new_trends.append(signature)
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(4)
                 except Exception as e:
                     print(f"Error sending to {chat_id}: {e}")
             else:
@@ -266,7 +266,7 @@ async def get_trending(update: Update, context: CallbackContext):
                     try:
                         await context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
                         new_trends.append(signature)
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(4)
                     except Exception as e:
                         print(f"Error sending to {chat_id}: {e}")
 
