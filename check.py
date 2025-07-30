@@ -103,7 +103,7 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
             try:
                 await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
                 new_tokens.append(signature)
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
             except Exception as e:
                 print(f"Error sending to {chat_id}: {e}")
 
@@ -161,7 +161,7 @@ async def get_latest_boost(context: CallbackContext):
             try:
                 await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
                 new_boosts.append(signature)
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
             except Exception as e:
                 print(f"Error sending to {chat_id}: {e}")
 
@@ -231,7 +231,7 @@ async def get_trending(update: Update, context: CallbackContext):
             try:
                 await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
                 new_trends.append(signature)
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
             except Exception as e:
                 print(f"Error sending to {chat_id}: {e}")
 

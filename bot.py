@@ -61,9 +61,9 @@ async def run_token_checker(app):
             context = CallbackContext(app)
             update = Update(app)
             await get_latest_tokens(update, context)
-            await asyncio.sleep(10)
+            await asyncio.sleep(15)
             await get_latest_boost(context)
-            await asyncio.sleep(10)
+            await asyncio.sleep(15)
             await get_trending(update, context)
         except Exception as e:
             print(f"Error in checker: {e}")
