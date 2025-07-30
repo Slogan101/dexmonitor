@@ -4,7 +4,8 @@ from telegram import Update
 from flask import Flask
 from threading import Thread
 from telegram.ext import Application, MessageHandler, filters, CommandHandler, ContextTypes
-from checker import get_latest_boost, get_latest_tokens, register, get_trending
+# from checker import get_latest_boost, get_latest_tokens, register, get_trending
+from check import get_latest_tokens, get_latest_boost, get_trending, register
 from dotenv import load_dotenv
 
 
@@ -33,7 +34,7 @@ async def bot():
     # app.add_handler(CommandHandler("register", register))
     app.add_handler(MessageHandler(filters.ChatType.CHANNEL & ~filters.COMMAND, register))
     # app.add_handler(MessageHandler(filters.ALL, handle_forward))
-    start_flask()
+    # start_flask()
 
     token_checker = asyncio.create_task(run_token_checker(app))
     async with app:

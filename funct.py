@@ -2,9 +2,6 @@ import json
 import os
 import datetime
 
-
-
-
 MAX_TOKENS = 1000
 SENT_TOKENS_FILE = "sent_tokens.json"
 BOOST_SENT_FILE = "sent_boost.json"
@@ -12,104 +9,109 @@ SENT_TRENDS_FILE = "sent_trends.json"
 CHAT_FILE = "registered_chats.json"
 
 
-# FOR NEW TOKENS
+# =================== UTILITIES ===================9
+
+def replace_or_add(signature, existing_signatures):
+    replaced = False
+    for i, entry in enumerate(existing_signatures):
+        if entry["tokenAddress"] == signature["tokenAddress"] and entry["chainId"] == signature["chainId"]:
+            # Check if values differ
+            if entry != signature:
+                existing_signatures[i] = signature  # Update existing
+                replaced = True
+            return existing_signatures, replaced
+    existing_signatures.append(signature)
+    return existing_signatures, True  # New entry added
+
+
+# =================== TOKENS ===================
+
 async def load_sent_file():
     if not os.path.exists(SENT_TOKENS_FILE):
         return []
-
     with open(SENT_TOKENS_FILE, "r") as f:
-        return json.load(f)  # returns list of dicts
+        return json.load(f)
 
 
 def save_sent_file(new_tokens):
     existing_tokens = []
-
-    # Load existing tokens from file if it exists
     if os.path.exists(SENT_TOKENS_FILE):
         try:
             with open(SENT_TOKENS_FILE, "r") as f:
                 existing_tokens = json.load(f)
         except json.JSONDecodeError:
-            print("⚠️ Warning: Corrupted sent file. Resetting.")
-            existing_tokens = []
+            print("⚠️ Warning: Corrupted sent_tokens.json. Resetting.")
 
-    # Combine and keep only the last MAX_TOKENS
-    combined_tokens = existing_tokens + new_tokens
-    trimmed_tokens = combined_tokens[-MAX_TOKENS:]
+    for token in new_tokens:
+        existing_tokens, _ = replace_or_add(token, existing_tokens)
 
-    # Save back to file
+    trimmed = existing_tokens[-MAX_TOKENS:]
     with open(SENT_TOKENS_FILE, "w") as f:
-        json.dump(trimmed_tokens, f, indent=2)
-# def save_sent_file(tokens):
-#     with open(SENT_TOKENS_FILE, "w") as f:
-#         json.dump(tokens, f, indent=2)
+        json.dump(trimmed, f, indent=2)
 
 
-def is_token_already_sent(token_signature, sent_signatures):
-    return token_signature in sent_signatures
-
+def is_token_already_sent(signature, sent_signatures):
+    for entry in sent_signatures:
+        if entry["tokenAddress"] == signature["tokenAddress"] and entry["chainId"] == signature["chainId"]:
+            return entry == signature  # True if identical
+    return False
 
 
 def make_token_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at):
     return {
         "name": name,
-        "address": token_address,
+        "tokenAddress": token_address,
         "symbol": symbol,
         "chainId": chain_id,
-        "volume" : volume_24h,
+        "volume": volume_24h,
         "liquidity": liquidity_usd,
         "marketCap": market_cap,
         "pairCreatedAt": created_at
     }
-# ---------------------------------------------------------------------------
 
-# FOR BOOSTED TOKENS
+# =================== BOOSTED ===================
+
 async def load_boosted_tokens():
     if not os.path.exists(BOOST_SENT_FILE):
         return []
     with open(BOOST_SENT_FILE, "r") as f:
         return json.load(f)
 
-async def save_boosted_tokens(new_tokens):
-    existing_tokens = []
 
-    # Load existing tokens from file if it exists
+async def save_boosted_tokens(new_tokens):
+    existing = []
     if os.path.exists(BOOST_SENT_FILE):
         try:
             with open(BOOST_SENT_FILE, "r") as f:
-                existing_tokens = json.load(f)
+                existing = json.load(f)
         except json.JSONDecodeError:
-            print("⚠️ Warning: Corrupted sent file. Resetting.")
-            existing_tokens = []
+            print("⚠️ Warning: Corrupted boost file. Resetting.")
 
-    # Combine and keep only the last MAX_TOKENS
-    combined_tokens = existing_tokens + new_tokens
-    trimmed_tokens = combined_tokens[-MAX_TOKENS:]
+    for token in new_tokens:
+        existing, _ = replace_or_add(token, existing)
 
-    # Save back to file
+    trimmed = existing[-MAX_TOKENS:]
     with open(BOOST_SENT_FILE, "w") as f:
-        json.dump(trimmed_tokens, f, indent=2)
+        json.dump(trimmed, f, indent=2)
 
-
-# async def save_boosted_tokens(data):
-#     with open(BOOST_SENT_FILE, "w") as f:
-#         json.dump(data, f, indent=2)
 
 def make_boost_signature(name, token_address, chain_id, amount=0, totalAmount=0):
     return {
         "name": name,
-        "address": token_address,
+        "tokenAddress": token_address,
         "chainId": chain_id,
         "amount": amount,
         "totalAmount": totalAmount
     }
 
+
 def is_boost_already_sent(signature, sent_list):
-    return signature in sent_list
+    for entry in sent_list:
+        if entry["tokenAddress"] == signature["tokenAddress"] and entry["chainId"] == signature["chainId"]:
+            return entry == signature
+    return False
 
-# ---------------------------------------------------------------------
-
-# FOR TRENDING TOKENS
+# =================== TRENDING ===================
 
 async def load_trending_tokens():
     if not os.path.exists(SENT_TRENDS_FILE):
@@ -117,67 +119,60 @@ async def load_trending_tokens():
     with open(SENT_TRENDS_FILE, "r") as f:
         return json.load(f)
 
-async def save_trending_tokens(new_tokens):
-    existing_tokens = []
 
-    # Load existing tokens from file if it exists
+async def save_trending_tokens(new_tokens):
+    existing = []
     if os.path.exists(SENT_TRENDS_FILE):
         try:
             with open(SENT_TRENDS_FILE, "r") as f:
-                existing_tokens = json.load(f)
+                existing = json.load(f)
         except json.JSONDecodeError:
-            print("⚠️ Warning: Corrupted sent file. Resetting.")
-            existing_tokens = []
+            print("⚠️ Warning: Corrupted trends file. Resetting.")
 
-    # Combine and keep only the last MAX_TOKENS
-    combined_tokens = existing_tokens + new_tokens
-    trimmed_tokens = combined_tokens[-MAX_TOKENS:]
+    for token in new_tokens:
+        existing, _ = replace_or_add(token, existing)
 
-    # Save back to file
+    trimmed = existing[-MAX_TOKENS:]
     with open(SENT_TRENDS_FILE, "w") as f:
-        json.dump(trimmed_tokens, f, indent=2)
+        json.dump(trimmed, f, indent=2)
 
-
-# async def save_trending_tokens(data):
-#     with open(SENT_TRENDS_FILE, "w") as f:
-#         json.dump(data, f, indent=2)
 
 def make_trending_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at):
     return {
         "name": name,
-        "address": token_address,
+        "tokenAddress": token_address,
         "symbol": symbol,
         "chainId": chain_id,
-        "volume" : volume_24h,
+        "volume": volume_24h,
         "liquidity": liquidity_usd,
         "marketCap": market_cap,
         "pairCreatedAt": created_at
     }
 
+
 def is_trend_already_sent(signature, sent_list):
-    return signature in sent_list
+    for entry in sent_list:
+        if entry["tokenAddress"] == signature["tokenAddress"] and entry["chainId"] == signature["chainId"]:
+            return entry == signature
+    return False
 
-# __-----------------------------------------------------
+# =================== CHATS ===================
 
-# FOR CHATS TO SEND DETAILS TO
 def load_registered_chats():
     if os.path.exists(CHAT_FILE):
         with open(CHAT_FILE, "r") as f:
             return set(json.load(f))
     return set()
 
+
 def save_registered_chats(chat_ids):
     with open(CHAT_FILE, "w") as f:
         json.dump(list(chat_ids), f)
 
-
+# =================== MISC ===================
 
 def token_age(ms_timestamp):
-    """
-    Converts a millisecond timestamp to "X days ago"
-    """
     try:
-        # Convert to seconds
         created_time = datetime.datetime.fromtimestamp(ms_timestamp / 1000)
         now = datetime.datetime.now()
         delta = now - created_time
@@ -194,13 +189,9 @@ def token_age(ms_timestamp):
             return "just now"
     except Exception:
         return "N/A"
-    
 
 
 def value_number(num):
-    """
-    Converts a large number into a readable string with suffixes (K, M, B)
-    """
     try:
         num = float(num)
         if num >= 1_000_000_000:
