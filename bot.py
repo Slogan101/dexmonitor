@@ -34,7 +34,7 @@ async def bot():
     # app.add_handler(CommandHandler("register", register))
     app.add_handler(MessageHandler(filters.ChatType.CHANNEL & ~filters.COMMAND, register))
     # app.add_handler(MessageHandler(filters.ALL, handle_forward))
-    # start_flask()
+    start_flask()
 
     token_checker = asyncio.create_task(run_token_checker(app))
     async with app:
