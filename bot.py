@@ -34,7 +34,7 @@ async def bot():
     # app.add_handler(CommandHandler("register", register))
     app.add_handler(MessageHandler(filters.ChatType.CHANNEL & ~filters.COMMAND, register))
     # app.add_handler(MessageHandler(filters.ALL, handle_forward))
-    start_flask()
+    # start_flask()
 
     token_checker = asyncio.create_task(run_token_checker(app))
     async with app:
@@ -61,9 +61,9 @@ async def run_token_checker(app):
             context = CallbackContext(app)
             update = Update(app)
             await get_latest_tokens(update, context)
-            await asyncio.sleep(15)
+            await asyncio.sleep(10)
             await get_latest_boost(context)
-            await asyncio.sleep(15)
+            await asyncio.sleep(10)
             await get_trending(update, context)
         except Exception as e:
             print(f"Error in checker: {e}")

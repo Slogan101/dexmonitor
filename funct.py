@@ -2,7 +2,7 @@ import json
 import os
 import datetime
 
-MAX_TOKENS = 2500
+MAX_TOKENS = 3500
 SENT_TOKENS_FILE = "sent_tokens.json"
 BOOST_SENT_FILE = "sent_boost.json"
 SENT_TRENDS_FILE = "sent_trends.json"
@@ -56,18 +56,24 @@ def is_token_already_sent(signature, sent_signatures):
             return entry == signature  # True if identical
     return False
 
-
-def make_token_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at):
+def make_token_signature(name, token_address, symbol, chain_id):
     return {
         "name": name,
         "tokenAddress": token_address,
         "symbol": symbol,
-        "chainId": chain_id,
-        "volume": volume_24h,
-        "liquidity": liquidity_usd,
-        "marketCap": market_cap,
-        "pairCreatedAt": created_at
+        "chainId": chain_id
     }
+# def make_token_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at):
+#     return {
+#         "name": name,
+#         "tokenAddress": token_address,
+#         "symbol": symbol,
+#         "chainId": chain_id,
+#         "volume": volume_24h,
+#         "liquidity": liquidity_usd,
+#         "marketCap": market_cap,
+#         "pairCreatedAt": created_at
+#     }
 
 # =================== BOOSTED ===================
 
@@ -136,18 +142,25 @@ async def save_trending_tokens(new_tokens):
     with open(SENT_TRENDS_FILE, "w") as f:
         json.dump(trimmed, f, indent=2)
 
-
-def make_trending_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at):
+def make_trending_signature(name, token_address, symbol, chain_id):
     return {
         "name": name,
         "tokenAddress": token_address,
         "symbol": symbol,
-        "chainId": chain_id,
-        "volume": volume_24h,
-        "liquidity": liquidity_usd,
-        "marketCap": market_cap,
-        "pairCreatedAt": created_at
+        "chainId": chain_id
     }
+
+# def make_trending_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at):
+#     return {
+#         "name": name,
+#         "tokenAddress": token_address,
+#         "symbol": symbol,
+#         "chainId": chain_id,
+#         "volume": volume_24h,
+#         "liquidity": liquidity_usd,
+#         "marketCap": market_cap,
+#         "pairCreatedAt": created_at
+#     }
 
 
 def is_trend_already_sent(signature, sent_list):

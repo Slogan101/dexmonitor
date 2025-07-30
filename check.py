@@ -48,6 +48,8 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
     for tok in tokens:
         token_address = tok.get("tokenAddress", "Unknown")
         chain_id = tok.get("chainId", "Unknown")
+        chart = tok.get("url", "Unknown")
+        header = tok.get("header", "Unknown")
 
         # Defaults
         name = symbol = main_vol = main_liq = main_cap = age = "N/A"
@@ -74,7 +76,7 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
         except Exception as e:
             print(f"Error processing token {token_address}: {e}")
 
-        signature = make_token_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at)
+        signature = make_token_signature(name, token_address, symbol, chain_id)
 
         if is_token_already_sent(signature, sent_tokens):
             print(f"⏭️ Already sent Token: {name} [{token_address}]")
@@ -87,7 +89,7 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
                 label = link.get("label") or link.get("type", "Unknown").capitalize()
                 url = link.get("url", "No URL")
                 link_lines.append(f"<a href='{url}'>{label}</a>")
-            links_text = "\n".join(link_lines)
+            links_text = " | ".join(link_lines)
         else:
             links_text = "None"
 
@@ -96,16 +98,25 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
             f"🔵 <b>{name} [{symbol}] [{chain_id}]</b>\n\n"
             f"<code>{token_address}</code>\n\n"
             f"🌱 Age: {age} | 💰 MC: <code>${main_cap}</code>\n💧 Liq: <code>${main_liq}</code> | 📈 24H Vol: <code>${main_vol}</code>\n\n"
+            f"📊<a href='{chart}'>Chart</a>\n\n"
             f"🔗 <b>Social Links:</b>\n{links_text}"
         )
-
-        for chat_id in registered_groups:
-            try:
-                await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
-                new_tokens.append(signature)
-                await asyncio.sleep(4)
-            except Exception as e:
-                print(f"Error sending to {chat_id}: {e}")
+        if header != "Unknown":
+            for chat_id in registered_groups:
+                try:
+                    await context.bot.send_photo(chat_id=chat_id, photo=header, caption=message, parse_mode=ParseMode.HTML)
+                    new_tokens.append(signature)
+                    await asyncio.sleep(2)
+                except Exception as e:
+                    print(f"Error sending to {chat_id}: {e}")
+            else:
+                for chat_id in registered_groups:
+                    try:
+                        await context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+                        new_tokens.append(signature)
+                        await asyncio.sleep(2)
+                    except Exception as e:
+                        print(f"Error sending to {chat_id}: {e}")
 
     if new_tokens:
         save_sent_file(new_tokens)
@@ -119,6 +130,8 @@ async def get_latest_boost(context: CallbackContext):
     for tok in boosts:
         token_address = tok.get("tokenAddress", "Unknown")
         chain_id = tok.get("chainId", "Unknown")
+        chart = tok.get("url", "Unknown")
+        header = tok.get("header", "Unknown")
         total_boosts = tok.get("totalAmount", 0)
         recent_boosts = tok.get("amount", 0)
 
@@ -154,16 +167,26 @@ async def get_latest_boost(context: CallbackContext):
             f"🏷️ Token Name: <b>{name} [{chain_id}]</b>\n\n"
             f"<code>{token_address}</code>\n\n"
             f"<b>Boosts</b>: {recent_boosts} (Total: {total_boosts})\n\n"
+            f"📊<a href='{chart}'>Chart</a>\n"
             f"🔗 <b>Social Links:</b>\n{links_text}"
         )
 
-        for chat_id in registered_groups:
-            try:
-                await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
-                new_boosts.append(signature)
-                await asyncio.sleep(4)
-            except Exception as e:
-                print(f"Error sending to {chat_id}: {e}")
+        if header != "Unknown":
+            for chat_id in registered_groups:
+                try:
+                    await context.bot.send_photo(chat_id=chat_id, photo=header, caption=message, parse_mode=ParseMode.HTML)
+                    new_boosts.append(signature)
+                    await asyncio.sleep(2)
+                except Exception as e:
+                    print(f"Error sending to {chat_id}: {e}")
+            else:
+                for chat_id in registered_groups:
+                    try:
+                        await context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+                        new_boosts.append(signature)
+                        await asyncio.sleep(2)
+                    except Exception as e:
+                        print(f"Error sending to {chat_id}: {e}")
 
     if new_boosts:
         await save_boosted_tokens(new_boosts)
@@ -177,6 +200,8 @@ async def get_trending(update: Update, context: CallbackContext):
     for tok in trending:
         token_address = tok.get("tokenAddress", "Unknown")
         chain_id = tok.get("chainId", "Unknown")
+        chart = tok.get("url", "Unknown")
+        header = tok.get("header", "Unknown")
 
         name = symbol = main_vol = main_liq = main_cap = age = "N/A"
         volume_24h = liquidity_usd = market_cap = created_at = "N/A"
@@ -202,7 +227,7 @@ async def get_trending(update: Update, context: CallbackContext):
         except Exception as e:
             print(f"Error processing trending token {token_address}: {e}")
 
-        signature = make_trending_signature(name, token_address, symbol, chain_id, volume_24h, liquidity_usd, market_cap, created_at)
+        signature = make_trending_signature(name, token_address, symbol, chain_id)
 
         if is_trend_already_sent(signature, sent_trends):
             print(f"⏭️ Already sent trend: {name} [{token_address}]")
@@ -224,16 +249,26 @@ async def get_trending(update: Update, context: CallbackContext):
             f"🔵<b>{name} [{symbol}] [{chain_id}]</b>\n\n"
             f"<code>{token_address}</code>\n\n"
             f"🌱 Age: {age} | 💰 MC: <code>${main_cap}</code>\n💧 Liq: <code>${main_liq}</code> | 📈 24H Vol: <code>${main_vol}</code>\n\n"
+            f"📊<a href='{chart}'>Chart</a>\n"
             f"🔗 <b>Social Links:</b>\n{links_text}"
         )
 
-        for chat_id in registered_groups:
-            try:
-                await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
-                new_trends.append(signature)
-                await asyncio.sleep(4)
-            except Exception as e:
-                print(f"Error sending to {chat_id}: {e}")
+        if header != "Unknown":
+            for chat_id in registered_groups:
+                try:
+                    await context.bot.send_photo(chat_id=chat_id, photo=header, caption=message, parse_mode=ParseMode.HTML)
+                    new_trends.append(signature)
+                    await asyncio.sleep(2)
+                except Exception as e:
+                    print(f"Error sending to {chat_id}: {e}")
+            else:
+                for chat_id in registered_groups:
+                    try:
+                        await context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+                        new_trends.append(signature)
+                        await asyncio.sleep(2)
+                    except Exception as e:
+                        print(f"Error sending to {chat_id}: {e}")
 
     if new_trends:
         await save_trending_tokens(new_trends)
