@@ -44,9 +44,13 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
     tokens = response.json()
     sent_tokens = await load_sent_file()
     new_tokens = []
+    seen_addresses = set()
 
     for tok in tokens:
         token_address = tok.get("tokenAddress", "Unknown")
+        if token_address in seen_addresses:
+            continue  # Skip duplicates
+        seen_addresses.add(token_address)
         chain_id = tok.get("chainId", "Unknown")
         chart = tok.get("url", "Unknown")
         header = tok.get("header", "Unknown")
@@ -120,15 +124,21 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
 
     if new_tokens:
         save_sent_file(new_tokens)
+        seen_addresses.clear()
+
 
 
 async def get_latest_boost(context: CallbackContext):
     boosts = requests.get(LATEST_BOOST).json()
     sent_boosts = await load_boosted_tokens()
     new_boosts = []
+    seen_addresses = set()
 
     for tok in boosts:
         token_address = tok.get("tokenAddress", "Unknown")
+        if token_address in seen_addresses:
+            continue  # Skip duplicates
+        seen_addresses.add(token_address)
         chain_id = tok.get("chainId", "Unknown")
         chart = tok.get("url", "Unknown")
         header = tok.get("header", "Unknown")
@@ -190,15 +200,20 @@ async def get_latest_boost(context: CallbackContext):
 
     if new_boosts:
         await save_boosted_tokens(new_boosts)
+        seen_addresses.clear()
 
 
 async def get_trending(update: Update, context: CallbackContext):
     trending = requests.get(TRENDING_TOKENS).json()
     sent_trends = await load_trending_tokens()
     new_trends = []
+    seen_addresses = set()
 
     for tok in trending:
         token_address = tok.get("tokenAddress", "Unknown")
+        if token_address in seen_addresses:
+            continue  # Skip duplicates
+        seen_addresses.add(token_address)
         chain_id = tok.get("chainId", "Unknown")
         chart = tok.get("url", "Unknown")
         header = tok.get("header", "Unknown")
@@ -272,3 +287,4 @@ async def get_trending(update: Update, context: CallbackContext):
 
     if new_trends:
         await save_trending_tokens(new_trends)
+        seen_addresses.clear()
