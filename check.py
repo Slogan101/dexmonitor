@@ -71,6 +71,7 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
                     volume_24h = pair.get("volume", {}).get("h24", 0)
                     main_vol = value_number(volume_24h)
                     liquidity_usd = pair.get("liquidity", {}).get("usd", 0)
+                    price_change = pair.get("priceChange", {}).get("h24", 0)
                     main_liq = value_number(liquidity_usd)
                     market_cap = pair.get("marketCap", 0)
                     main_cap = value_number(market_cap)
@@ -97,11 +98,13 @@ async def get_latest_tokens(update: Update, context: CallbackContext):
             links_text = "None"
 
         message = (
-            f"🚨🚨🚨<b>Token Alert🚨🚨🚨</b>\n\n"
+            f"🚨 <b>Token Alert!</b>\n\n"
             f"🔵 <b>{name} [{symbol}] [{chain_id}]</b>\n\n"
             f"<code>{token_address}</code>\n\n"
-            f"🌱 Age: {age} | 💰 MC: <code>${main_cap}</code>\n💧 Liq: <code>${main_liq}</code> | 📈 24H Vol: <code>${main_vol}</code>\n\n"
-            f"📊<a href='{chart}'>Chart</a>\n\n"
+            f"🌱Age: {age} | 💰MC: <code>${main_cap}</code>\n"
+            f"💧Liq: <code>${main_liq}</code> | 📈24h: <code>{price_change}%</code>\n"
+            f"🔊Vol: <code>${main_vol}</code>\n\n"
+            f"📊<a href='{chart}'>Chart</a>\n"
             f"🔗 <b>{links_text}</b>"
         )
         if header != "Unknown":
@@ -136,16 +139,30 @@ async def get_latest_boost(context: CallbackContext):
         total_boosts = tok.get("totalAmount", 0)
         recent_boosts = tok.get("amount", 0)
 
+        name = symbol = main_vol = main_liq = main_cap = age = "N/A"
+        volume_24h = liquidity_usd = market_cap = created_at = "N/A"
+        
         try:
             name_resp = requests.get(f"{TOKEN_PROFILE_NAMES}/{token_address}")
             if name_resp.status_code == 200:
                 name_data = name_resp.json()
                 pairs = name_data.get("pairs", [])
-                name = pairs[0].get("baseToken", {}).get("name", "Unknown") if pairs else "Unknown"
-            else:
-                name = "Unknown"
-        except Exception:
-            name = "Unknown"
+                if pairs:
+                    pair = pairs[0]
+                    base_token = pair.get("baseToken", {})
+                    name = base_token.get("name", "Unknown Name")
+                    symbol = base_token.get("symbol", "Unknown Symbol")
+                    volume_24h = pair.get("volume", {}).get("h24", 0)
+                    main_vol = value_number(volume_24h)
+                    liquidity_usd = pair.get("liquidity", {}).get("usd", 0)
+                    price_change = pair.get("priceChange", {}).get("h24", 0)
+                    main_liq = value_number(liquidity_usd)
+                    market_cap = pair.get("marketCap", 0)
+                    main_cap = value_number(market_cap)
+                    created_at = pair.get("pairCreatedAt", 0)
+                    age = token_age(created_at)
+        except Exception as e:
+            print(f"Error processing trending token {token_address}: {e}")
 
         signature = make_boost_signature(name, token_address, chain_id, recent_boosts, total_boosts)
         if is_boost_already_sent(signature, sent_boosts):
@@ -164,10 +181,13 @@ async def get_latest_boost(context: CallbackContext):
             links_text = "None"
 
         message = (
-            f"🚀🚀🚀<b>New Boost Alert🚀🚀🚀</b>\n\n"
-            f"🔵 <b>{name} [{chain_id}]</b>\n\n"
+            f"⚡️ <b>{recent_boosts} Token Boosts!</b>\n\n"
+            f"🔵 <b>{name} [{symbol}] [{chain_id}]</b>\n\n"
             f"<code>{token_address}</code>\n\n"
-            f"<b>Boosts</b>: {recent_boosts} (Total: {total_boosts})\n\n"
+            f"<b>Total Boosts</b>: {total_boosts}\n\n"
+            f"🌱Age: {age} | 💰MC: <code>${main_cap}</code>\n"
+            f"💧 Liq: <code>${main_liq}</code> | 📈24h: <code>{price_change}%</code>\n"
+            f"🔊Vol: <code>${main_vol}</code>\n\n"
             f"📊<a href='{chart}'>Chart</a>\n"
             f"🔗 <b>{links_text}</b>"
         )
@@ -220,6 +240,7 @@ async def get_trending(update: Update, context: CallbackContext):
                     volume_24h = pair.get("volume", {}).get("h24", 0)
                     main_vol = value_number(volume_24h)
                     liquidity_usd = pair.get("liquidity", {}).get("usd", 0)
+                    price_change = pair.get("priceChange", {}).get("h24", 0)
                     main_liq = value_number(liquidity_usd)
                     market_cap = pair.get("marketCap", 0)
                     main_cap = value_number(market_cap)
@@ -246,10 +267,12 @@ async def get_trending(update: Update, context: CallbackContext):
             links_text = "None"
 
         message = (
-            f"🚨<b>Trending</b>🚨\n\n"
-            f"🔵<b>{name} [{symbol}] [{chain_id}]</b>\n\n"
+            f"🚨 <b>Trending</b>\n\n"
+            f"🔵 <b>{name} [{symbol}] [{chain_id}]</b>\n\n"
             f"<code>{token_address}</code>\n\n"
-            f"🌱 Age: {age} | 💰 MC: <code>${main_cap}</code>\n💧 Liq: <code>${main_liq}</code> | 📈 24H Vol: <code>${main_vol}</code>\n\n"
+            f"🌱Age: {age} | 💰MC: <code>${main_cap}</code>\n"
+            f"💧 Liq: <code>${main_liq}</code> | 📈24h: <code>{price_change}%</code>\n"
+            f"🔊Vol: <code>${main_vol}</code>\n\n"
             f"📊<a href='{chart}'>Chart</a>\n"
             f"🔗 <b>{links_text}</b>"
         )

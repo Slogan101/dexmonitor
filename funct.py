@@ -191,13 +191,13 @@ def token_age(ms_timestamp):
         delta = now - created_time
 
         if delta.days >= 1:
-            return f"{delta.days} day{'s' if delta.days > 1 else ''} ago"
+            return f"{delta.days}d"
         elif delta.seconds >= 3600:
             hours = delta.seconds // 3600
-            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+            return f"{hours} hr{'s' if hours > 1 else ''}"
         elif delta.seconds >= 60:
             minutes = delta.seconds // 60
-            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+            return f"{minutes}min{'s' if minutes > 1 else ''}"
         else:
             return "just now"
     except Exception:
